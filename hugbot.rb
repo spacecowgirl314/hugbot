@@ -6,7 +6,7 @@ databaseExists = File.exist?("hugs.db")
 db = SQLite3::Database.new "hugs.db"
 
 if not databaseExists
-    rows = db.execute <<-SQLite3
+    users = db.execute <<-SQLite3
     CREATE TABLE users (
         user text primary key,
         nick text,
@@ -26,14 +26,14 @@ bot = Cinch::Bot.new do
   # Hug Detection
 
   on :message, /(hugs).*?((?:[a-z][a-z]+))/ do |m|
-  	isUserNew = 0
-  	db.execute("SELECT * FROM users WHERE user='#{m.user.user}'") do |row|
-        isUserNew = 1
+  	isUserNew = true
+  	db.execute("SELECT * FROM users WHERE user='#{m.user.user}'") do |user|
+        isUserNew = false
     end
-    if isUserNew==0
+    if isUserNew
         db.execute("INSERT INTO users VALUES ('#{m.user.user}', '#{m.user.nick}', 0)")
     end
-    db.execute("UPDATE users SET hugcount = hugcount+1 WHERE user = '#{m.user.user}'")
+    db.execute("UPDATE users SET hugcount = hugcount + 1 WHERE user = '#{m.user.user}'")
     db.execute("UPDATE users SET nick = '#{m.user.nick}' WHERE user = '#{m.user.user}'")
   end
 
@@ -45,9 +45,24 @@ bot = Cinch::Bot.new do
 
   # Commands
 
-  on :message, /(@)(hugcount)/ do |m|
-  	db.execute("SELECT * FROM users ORDER BY hugcount") do |user|
-        m.reply "#{user[1]}:#{user[2]}"
+  on :message, /(@)(hugcount).*?(all)/ do |m|
+  	message = ""
+    db.execute("SELECT * FROM users ORDER BY hugcount DESC") do |user|
+        message += "#{user[1]}:#{user[2]} "
+    end
+    m.reply message
+  end
+  on :message, /(@)(hugcount).*?(top)/ do |m|
+    message = ""
+    limit = 5
+    db.execute("SELECT * FROM users ORDER BY hugcount DESC LIMIT 5") do |user|
+        message += "#{user[1]}:#{user[2]} "
+    end
+    m.reply message
+  end
+  on :message, /(@)(hugcount)$/ do |m|
+    db.execute("SELECT * FROM users WHERE user='#{m.user.user}'") do |user|
+      m.reply "#{user[1]} has given #{user[2]} hugs"
     end
   end
 end
