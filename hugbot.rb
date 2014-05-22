@@ -20,7 +20,7 @@ bot = Cinch::Bot.new do
   	c.nick = "hugbot"
   	c.name = "hugbot"
     c.server = "irc.unstable.systems"
-    c.channels = ["#test"]
+    c.channels = ["#chat"]
     c.port = 6697
     c.ssl.use = true
   end
@@ -28,6 +28,11 @@ bot = Cinch::Bot.new do
   # Hug Detection
 
   on :action, /(hugs).*?((?:[a-z][a-z]+))/ do |m|
+    # Prevent Hug Spamming
+    if not m.channel?
+      return
+    end
+
     isUserNew = true
     db.execute("SELECT * FROM users WHERE user='#{m.user.user}'") do |user|
       isUserNew = false
@@ -42,7 +47,7 @@ bot = Cinch::Bot.new do
   # Hugging Back
 
   on :action, /(hugs).*?(hugbot)/ do |m|
-  	m.action_reply "hugs #{m.user.nick}"
+    m.action_reply "hugs #{m.user.nick}"
   end
 
   # Commands
