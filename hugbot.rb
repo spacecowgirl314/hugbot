@@ -52,24 +52,44 @@ bot = Cinch::Bot.new do
 
   # Commands
 
-  on :message, /(@)(hugcount).*?(all)/ do |m|
+  on :message, /(%)(hugcount).*?(all)/ do |m|
   	message = ""
+    hasHugs = false
     db.execute("SELECT * FROM users ORDER BY hugcount DESC") do |user|
-        message += "#{user[1]}:#{user[2]} "
+      hasHugs = true
+      message += "#{user[1]}:#{user[2]} "
     end
+
+    if not hasHugs
+      m.reply "No hugs have been given"
+    end
+
     m.reply message
   end
-  on :message, /(@)(hugcount).*?(top)/ do |m|
+  on :message, /(%)(hugcount).*?(top)/ do |m|
     message = ""
     limit = 5
+    hasHugs = false
     db.execute("SELECT * FROM users ORDER BY hugcount DESC LIMIT 5") do |user|
-        message += "#{user[1]}:#{user[2]} "
+      hasHugs = true
+      message += "#{user[1]}:#{user[2]} "
     end
+
+    if not hasHugs
+      m.reply "No hugs have been given"
+    end
+
     m.reply message
   end
-  on :message, /(@)(hugcount)$/ do |m|
+  on :message, /(%)(hugcount)$/ do |m|
+    hasHugs = false
     db.execute("SELECT * FROM users WHERE user='#{m.user.user}'") do |user|
+      hasHugs = true
       m.reply "#{user[1]} has given #{user[2]} hugs"
+    end
+
+    if not hasHugs
+      m.reply "#{m.user.nick} has not given any hugs"
     end
   end
 end
