@@ -26,9 +26,9 @@ bot = Cinch::Bot.new do
   # Hug Detection
 
   on :message, /(hugs).*?((?:[a-z][a-z]+))/ do |m|
-  	isUserNew = true
-  	db.execute("SELECT * FROM users WHERE user='#{m.user.user}'") do |user|
-        isUserNew = false
+    isUserNew = true
+    db.execute("SELECT * FROM users WHERE user='#{m.user.user}'") do |user|
+      isUserNew = false
     end
     if isUserNew
         db.execute("INSERT INTO users VALUES ('#{m.user.user}', '#{m.user.nick}', 0)")
