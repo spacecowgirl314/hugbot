@@ -18,9 +18,11 @@ end
 bot = Cinch::Bot.new do
   configure do |c|
   	c.nick = "hugbot"
-  	c.name = "hugbot"
+  	c.user = "hugbot"
+    c.realname = "hugbot"
     c.server = "irc.unstable.systems"
     c.channels = ["#chat"]
+    c.modes = ["+B"]
     c.port = 6697
     c.ssl.use = true
   end
