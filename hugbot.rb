@@ -52,6 +52,10 @@ bot = Cinch::Bot.new do
     m.action_reply "hugs #{m.user.nick}"
   end
 
+  on :action, /(botsnack).*?(hugbot)/ do |m|
+    m.action_reply "noms the botsnack :D"
+  end
+
   # Commands
 
   on :message, /(%)(hugcount).*?(all)/ do |m|
